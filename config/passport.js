@@ -1,19 +1,7 @@
-const User = require('../database/models/user_model')
+const User = require('../database/models/user')
 const passport = require('passport');
 const GitHubStrategy = require('passport-github').Strategy;
-
-passport.serializeUser((user, done) => {
-    done(null, user.id);
-})
-
-passport.deserializeUser(async (id, done) => {
-    try {
-        const user = await User.findById(id);
-        done(null, user);
-    } catch(error) {
-        done(error);
-    }
-});
+const JwtStrategy = require('passport-jwt').Strategy;
 
 passport.use(new GitHubStrategy({
     clientID: process.env.GITHUB_CLIENT_ID,
@@ -30,6 +18,26 @@ passport.use(new GitHubStrategy({
                     githubId: profile.id
                 }).catch(done);
             } 
+            return done(null, user);
+        }
+        return done(null, false);
+    }
+));
+
+passport.use(new JwtStrategy(
+    {
+        secretOrKey: process.env.JWT_SECRET,
+        // This will go away when we implement client-side JWT Auth Bearer.
+        jwtFromRequest: (req) => {
+            if (req && req.cookies) {
+                return req.cookies['jwt'];
+            }
+            return null;
+        }
+    },
+    async (payload, done) => {
+        const user = await User.findById(payload.sub).catch(done);
+        if (user) {
             return done(null, user);
         }
         return done(null, false);
