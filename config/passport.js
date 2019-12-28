@@ -1,4 +1,4 @@
-const User = require('../database/models/user')
+const User = require('../database/models/user_model')
 const passport = require('passport');
 const GitHubStrategy = require('passport-github').Strategy;
 const JwtStrategy = require('passport-jwt').Strategy;

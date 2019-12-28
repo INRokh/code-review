@@ -1,8 +1,11 @@
 const express = require('express');
 const app = express();
 
+const cors = require('cors');
+app.use(cors());
+
 const mongoose = require('mongoose');
-require('./database/models/user');
+require('./database/models/user_model');
 mongoose.connect(process.env.DB_HOST, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.Promise = global.Promise;
 mongoose.connection.on('error', console.log);
