@@ -2,6 +2,7 @@ const router = require('express').Router();
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 
+// Redirect to GitHub auth
 router.get(
     '/github',
     passport.authenticate('github', {
@@ -10,26 +11,27 @@ router.get(
     })
 );
 
+// Exchange GitHub auth code to JWT
 router.get(
-    '/github/callback', 
+    '/jwt/github', 
     passport.authenticate('github', {
         session: false,
         failureRedirect: '/login' 
-    }),
+    }), 
+
     (req, res) => { 
-        const token = jwt.sign({sub: req.user.id}, process.env.JWT_SECRET);
-        // This will go away when client-side JWT Auth Bearer is implemented.
-        res.cookie('jwt', token);
-        res.redirect('/');
+        const token = jwt.sign(
+            {sub: req.user.id}, 
+            process.env.JWT_SECRET,
+            {expiresIn: process.env.JWT_TOKEN_TTL}
+        );
+        res.send({jwt: token});
     } 
 )
 
 router.get('/logout', (req, res) => {
-    // This will go away when client-side JWT Auth Bearer is implemented.
-    res.cookie('jwt', null, { maxAge: -1 });
-
     req.logout();
-    res.redirect('/');
+    res.send();
 })
 
 module.exports = router;

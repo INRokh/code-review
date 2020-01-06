@@ -5,9 +5,6 @@ import * as actions from '../actions';
 
 import Header from './Header'
 
-// const Landing = () => <h2>Landing</h2>;
-//{/* <Route exact path='/' component={Landing} />  */}
-
 class App extends React.Component {
     componentDidMount() {
         this.props.fetchUser();
